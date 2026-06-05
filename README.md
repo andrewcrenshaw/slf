@@ -31,6 +31,8 @@ npm test          # 126 tests across 19 suites
 npm run bench     # gate-engine + crypto microbenchmarks
 ```
 
+A standard `npm install` builds everything the suite needs, and all 126 tests pass. A few integration tests drive the gate engine against a real SQLite substrate through `better-sqlite3`, a native module compiled during install - if you install with `--ignore-scripts`, or on a platform with neither a prebuilt binary nor a build toolchain, the native driver is absent and those tests cannot load. A plain `npm install` resolves it.
+
 ## Quickstart
 
 ```ts
