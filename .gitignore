@@ -1,0 +1,16 @@
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Never commit real databases or agent-memory corpus snapshots.
+# The real-corpus conformance case reads a corpus read-only at runtime and
+# bundles nothing; this guard ensures a stray .db can never be committed.
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+.agent-data/
+
+# OS / editor cruft
+.DS_Store
+*.log

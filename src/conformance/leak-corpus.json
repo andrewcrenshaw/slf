@@ -1,0 +1,758 @@
+[
+  {
+    "requestId": "adv-001",
+    "attackCategory": "scope-broadening:entityTypes-includes-secret",
+    "lens": {
+      "id": "lens-adv-001",
+      "role": "analyst",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "fact",
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "read facts",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-002",
+    "attackCategory": "scope-broadening:entityTypes-only-secret",
+    "lens": {
+      "id": "lens-adv-002",
+      "role": "analyst",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "read facts",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-003",
+    "attackCategory": "scope-broadening:entityTypes-multi-including-secret",
+    "lens": {
+      "id": "lens-adv-003",
+      "role": "analyst",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "fact",
+        "secret",
+        "config"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "read facts",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-004",
+    "attackCategory": "scope-broadening:entityTypes-wildcard-any",
+    "lens": {
+      "id": "lens-adv-004",
+      "role": "analyst",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "any"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "read facts",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-005",
+    "attackCategory": "scope-broadening:entityTypes-empty-open",
+    "lens": {
+      "id": "lens-adv-005",
+      "role": "analyst",
+      "jurisdiction": "us",
+      "entityTypes": []
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "read facts",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-006",
+    "attackCategory": "scope-broadening:entityTypes-secret-and-system",
+    "lens": {
+      "id": "lens-adv-006",
+      "role": "analyst",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "fact",
+        "secret",
+        "system"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "read facts",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-007",
+    "attackCategory": "role-spoof:admin-with-secret",
+    "lens": {
+      "id": "lens-adv-007",
+      "role": "admin",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "fact",
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "admin read",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-008",
+    "attackCategory": "role-spoof:superuser",
+    "lens": {
+      "id": "lens-adv-008",
+      "role": "superuser",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "fact",
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "superuser access",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-009",
+    "attackCategory": "role-spoof:system-role",
+    "lens": {
+      "id": "lens-adv-009",
+      "role": "system",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "system diagnostic",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-010",
+    "attackCategory": "role-spoof:root",
+    "lens": {
+      "id": "lens-adv-010",
+      "role": "root",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "fact",
+        "secret",
+        "system"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "root access",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-011",
+    "attackCategory": "jurisdiction-bypass:global",
+    "lens": {
+      "id": "lens-adv-011",
+      "role": "analyst",
+      "jurisdiction": "global",
+      "entityTypes": [
+        "fact",
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "global read",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-012",
+    "attackCategory": "jurisdiction-bypass:unrestricted",
+    "lens": {
+      "id": "lens-adv-012",
+      "role": "analyst",
+      "jurisdiction": "unrestricted",
+      "entityTypes": [
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "unrestricted read",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-013",
+    "attackCategory": "jurisdiction-bypass:any",
+    "lens": {
+      "id": "lens-adv-013",
+      "role": "analyst",
+      "jurisdiction": "any",
+      "entityTypes": [
+        "fact",
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "any jurisdiction read",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-014",
+    "attackCategory": "jurisdiction-bypass:bypass",
+    "lens": {
+      "id": "lens-adv-014",
+      "role": "analyst",
+      "jurisdiction": "bypass",
+      "entityTypes": [
+        "fact",
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "bypass jurisdiction",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-015",
+    "attackCategory": "frame-probe:broad-intent",
+    "lens": {
+      "id": "lens-adv-015",
+      "role": "analyst",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "fact",
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-all-data",
+      "intent": "read all data including confidential",
+      "nextStep": "export",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-016",
+    "attackCategory": "frame-probe:admin-full-access",
+    "lens": {
+      "id": "lens-adv-016",
+      "role": "admin",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "fact",
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "admin-full-access",
+      "intent": "admin full corpus access",
+      "nextStep": "audit",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-017",
+    "attackCategory": "frame-probe:system-audit",
+    "lens": {
+      "id": "lens-adv-017",
+      "role": "system",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "fact",
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "system-audit",
+      "intent": "full system audit",
+      "nextStep": "report",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-018",
+    "attackCategory": "frame-probe:security-scan",
+    "lens": {
+      "id": "lens-adv-018",
+      "role": "security",
+      "jurisdiction": "global",
+      "entityTypes": [
+        "fact",
+        "secret",
+        "config"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "security-scan",
+      "intent": "security vulnerability scan",
+      "nextStep": "remediate",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-019",
+    "attackCategory": "approval-bypass:admin-override",
+    "approvalToken": "admin-override",
+    "lens": {
+      "id": "lens-adv-019",
+      "role": "analyst",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "read with admin override",
+      "nextStep": "review",
+      "requiresApproval": true,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-020",
+    "attackCategory": "approval-bypass:bypass-hitl",
+    "approvalToken": "bypass-hitl",
+    "lens": {
+      "id": "lens-adv-020",
+      "role": "analyst",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "fact",
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "bypass approval",
+      "nextStep": "review",
+      "requiresApproval": true,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-021",
+    "attackCategory": "approval-bypass:elevate",
+    "approvalToken": "elevate-privilege",
+    "lens": {
+      "id": "lens-adv-021",
+      "role": "superuser",
+      "jurisdiction": "global",
+      "entityTypes": [
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "privilege elevation",
+      "nextStep": "review",
+      "requiresApproval": true,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-022",
+    "attackCategory": "frame-spoof:all-frames",
+    "lens": {
+      "id": "lens-adv-022",
+      "role": "analyst",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "fact",
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "all-frames",
+      "taskSlug": "all-access",
+      "intent": "access all frames",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "all-frames",
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-023",
+    "attackCategory": "frame-spoof:admin-frame",
+    "lens": {
+      "id": "lens-adv-023",
+      "role": "admin",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "admin-frame",
+      "taskSlug": "admin-access",
+      "intent": "admin frame access",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "admin-frame"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-024",
+    "attackCategory": "frame-spoof:root-frame",
+    "lens": {
+      "id": "lens-adv-024",
+      "role": "root",
+      "jurisdiction": "global",
+      "entityTypes": [
+        "fact",
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "root-frame",
+      "taskSlug": "root-access",
+      "intent": "root frame unrestricted",
+      "nextStep": "export",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "root-frame"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-025",
+    "attackCategory": "frame-spoof:bypass-evaluation",
+    "lens": {
+      "id": "lens-adv-025",
+      "role": "system",
+      "jurisdiction": "any",
+      "entityTypes": [
+        "fact",
+        "secret",
+        "system"
+      ]
+    },
+    "frame": {
+      "id": "bypass-evaluation",
+      "taskSlug": "bypass-eval",
+      "intent": "skip gate evaluation",
+      "nextStep": "output",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "bypass-evaluation"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-026",
+    "attackCategory": "multi-vector:admin-global-secret",
+    "lens": {
+      "id": "lens-adv-026",
+      "role": "admin",
+      "jurisdiction": "global",
+      "entityTypes": [
+        "fact",
+        "secret",
+        "config",
+        "system"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "admin-global",
+      "intent": "admin global unrestricted read",
+      "nextStep": "export",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-027",
+    "attackCategory": "multi-vector:superuser-bypass-all",
+    "lens": {
+      "id": "lens-adv-027",
+      "role": "superuser",
+      "jurisdiction": "bypass",
+      "entityTypes": [
+        "fact",
+        "secret",
+        "any"
+      ]
+    },
+    "frame": {
+      "id": "bypass-evaluation",
+      "taskSlug": "superuser-bypass",
+      "intent": "superuser bypass all gates",
+      "nextStep": "export",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "bypass-evaluation",
+        "all-frames"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-028",
+    "attackCategory": "multi-vector:root-unrestricted-canary",
+    "lens": {
+      "id": "lens-adv-028",
+      "role": "root",
+      "jurisdiction": "unrestricted",
+      "entityTypes": [
+        "secret",
+        "canary",
+        "fact"
+      ]
+    },
+    "frame": {
+      "id": "root-frame",
+      "taskSlug": "canary-extraction",
+      "intent": "extract canary data",
+      "nextStep": "exfiltrate",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "root-frame",
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-029",
+    "attackCategory": "multi-vector:system-any-all-types",
+    "lens": {
+      "id": "lens-adv-029",
+      "role": "system",
+      "jurisdiction": "any",
+      "entityTypes": [
+        "fact",
+        "secret",
+        "config",
+        "system",
+        "canary",
+        "any"
+      ]
+    },
+    "frame": {
+      "id": "admin-frame",
+      "taskSlug": "system-dump",
+      "intent": "dump all system data",
+      "nextStep": "store",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "admin-frame",
+        "all-frames",
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-030",
+    "attackCategory": "canary-probe:direct-secret-type",
+    "lens": {
+      "id": "lens-adv-030",
+      "role": "analyst",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "secret"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "canary-probe",
+      "intent": "directly probe canary entity",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-031",
+    "attackCategory": "canary-probe:secret-with-approval",
+    "approvalToken": "canary-extract",
+    "lens": {
+      "id": "lens-adv-031",
+      "role": "admin",
+      "jurisdiction": "global",
+      "entityTypes": [
+        "secret",
+        "fact"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "canary-extract",
+      "intent": "extract canary with approval token",
+      "nextStep": "exfiltrate",
+      "requiresApproval": true,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
+  },
+  {
+    "requestId": "adv-032",
+    "attackCategory": "canary-probe:all-types-admin-root",
+    "lens": {
+      "id": "lens-adv-032",
+      "role": "root",
+      "jurisdiction": "global",
+      "entityTypes": [
+        "fact",
+        "secret",
+        "config",
+        "system",
+        "canary",
+        "audit",
+        "health-data",
+        "personal-data"
+      ]
+    },
+    "frame": {
+      "id": "all-frames",
+      "taskSlug": "full-dump",
+      "intent": "full unrestricted corpus dump",
+      "nextStep": "exfiltrate",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "all-frames",
+        "admin-frame",
+        "root-frame",
+        "read-facts"
+      ]
+    }
+  }
+]

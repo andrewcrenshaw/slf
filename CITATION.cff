@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use slf-core, please cite both the software and the position paper below."
+title: "slf-core: a reference implementation of Substrate-Lens-Frame (SLF)"
+abstract: "A standalone Apache-2.0 reference implementation of Substrate-Lens-Frame, a governance layer for agent memory: did:key and Ed25519 signing, a four-step gate engine, hash-chained payload-free receipts, crypto-erasure, and an executable conformance suite."
+type: software
+authors:
+  - family-names: Crenshaw
+    given-names: Andrew
+    email: andrew@lexenne.com
+    affiliation: Lexenne
+    orcid: "https://orcid.org/0009-0006-6459-0187"
+version: 0.1.0
+license: Apache-2.0
+repository-code: "https://github.com/andrewcrenshaw/slf"
+keywords:
+  - agent-memory
+  - governance
+  - authorization
+  - verifiable-credentials
+  - audit
+  - privacy
+preferred-citation:
+  type: article
+  title: "The Governance Gap in Agentic Memory: Substrate-Lens-Frame, a sovereign, auditable memory protocol for AI agents"
+  authors:
+    - family-names: Crenshaw
+      given-names: Andrew
+      affiliation: Lexenne
+      orcid: "https://orcid.org/0009-0006-6459-0187"
+  year: 2026
+  # DOI added on Zenodo deposit.
