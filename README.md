@@ -1,5 +1,7 @@
 # slf-core
 
+[![DOI](https://zenodo.org/badge/1260677156.svg)](https://doi.org/10.5281/zenodo.20571989)
+
 Reference implementation of **Substrate-Lens-Frame (SLF)**, a governance layer for agent memory. Apache-2.0.
 
 Agent memory has become its own layer in the AI stack, and almost all of the work in it goes to one question: how well can the system recall the right fact at the right time. That work matters. But it leaves a second question open, and it is the one that decides whether agent memory can be trusted with regulated or personal data - who is allowed to see a fact, how its meaning changes by role and jurisdiction, and what was disclosed to whom. SLF puts the access rules inside the fact, so the rules travel with the fact and are re-checked on every read.
@@ -163,7 +165,7 @@ bench/                          gate-engine + crypto microbenchmarks
 
 ## Reference and citation
 
-`slf-core` is the reference implementation for the position paper *The Governance Gap in Agentic Memory: Substrate-Lens-Frame, a sovereign, auditable memory protocol for AI agents* (Andrew Crenshaw, 2026). See [CITATION.cff](CITATION.cff). The canonical paper and a citable DOI are added here on deposit. The project hub - paper, specifications, and background - lives at https://lexenne.com/slf.
+`slf-core` is the reference implementation for the position paper *The Governance Gap in Agentic Memory: Substrate-Lens-Frame, a sovereign, auditable memory protocol for AI agents* (Andrew Crenshaw, 2026). See [CITATION.cff](CITATION.cff). Paper DOI: [10.5281/zenodo.20571518](https://doi.org/10.5281/zenodo.20571518). This release (v0.1.0) DOI: [10.5281/zenodo.20571990](https://doi.org/10.5281/zenodo.20571990) (concept DOI for all versions: [10.5281/zenodo.20571989](https://doi.org/10.5281/zenodo.20571989)). The project hub - paper, specifications, and background - lives at https://lexenne.com/slf.
 
 ## Stewardship
 

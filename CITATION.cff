@@ -10,6 +10,7 @@ authors:
     affiliation: Lexenne
     orcid: "https://orcid.org/0009-0006-6459-0187"
 version: 0.1.0
+doi: "10.5281/zenodo.20571990"
 license: Apache-2.0
 repository-code: "https://github.com/andrewcrenshaw/slf"
 keywords:
@@ -28,4 +29,4 @@ preferred-citation:
       affiliation: Lexenne
       orcid: "https://orcid.org/0009-0006-6459-0187"
   year: 2026
-  # DOI added on Zenodo deposit.
+  doi: "10.5281/zenodo.20571518"
