@@ -16,6 +16,8 @@ The vocabulary is standard: STRIDE for the security threats, LINDDUN for the pri
 
 **5. Network adversary.** An observer who replays messages or shows different log histories to different parties (a split-view attack). *Control:* the receipt log is hash-chained and content-addressed, so a split view or a reordered history fails `verifyChain`. Independent witnesses over the log close the remaining gap. *(STRIDE spoofing and tampering. `receipt-chain.ts`.)*
 
+**6. Forged HITL approver.** An actor that fabricates a human approval to resume a read a frame paused for oversight. *Control:* an approval token is a signed, request-bound, expiring artifact - an Ed25519 signature from the approver's did:key over the canonical `{requestId, approver, iat, exp}` claims. The gate resumes only when the signature verifies, the token's `requestId` matches the paused request, and the token has not expired; a bare `approve:` prefix, an unsigned token, a token minted for another request, an expired token, or a signature that does not match the claimed approver DID all pause for a real human rather than disclosing. *Residue:* a valid signature proves only that the holder of some key approved, not that the key belongs to an authorized approver. Given a trusted-approver set the gate rejects approvals from any other DID; without one, a self-asserted approver DID with its own keypair still produces a structurally valid token. Binding a DID to approval authority is a deployer act (see Out of scope below). *(STRIDE spoofing and elevation of privilege; OWASP LLM06, excessive agency. Case 06, HITL approval.)*
+
 ## The tension worth naming
 
 SLF wants non-repudiation of operations, which is itself a privacy threat to the subject under LINDDUN: a perfect audit trail is also a perfect record of behavior. Payload-free receipts are the mitigation. A receipt records field names, the gates evaluated, and the frame scope, never the disclosed values, so the trail proves what happened without re-exposing what was disclosed.
@@ -44,6 +46,7 @@ These are real limits, stated here rather than discovered later. They are the de
 - **Public replication.** A widely replicated public substrate cannot reconcile a right to erasure, so personal-data deployments should be permissioned, not public.
 - **Cross-border transfer legality.** SLF can encode which jurisdiction's rules govern a read and can evidence every cross-border disclosure, but the lawful basis for a transfer is a deployer act.
 - **Standing-grant judgment.** A standing grant makes the human-oversight boundary enforceable and visible; it cannot decide which decisions cross the threshold that requires fresh human approval for a given deployment.
+- **Approver authority binding.** The HITL gate authenticates that an approval token was signed by the approver DID it names, bound to the paused request, and unexpired. Which DIDs are *authorized* to approve is a deployer binding: supplied to the gate as a trusted-approver set, or enforced by controlling which keys are ever issued. Without that set the gate proves the signer holds the key, not that the signer has standing to approve.
 - **Cryptographic assurance.** The primitives are the standard `@noble` libraries used in a standard way. They have not had a formal cryptographic audit.
 
 ## Reporting
