@@ -1,8 +1,6 @@
-import { readFileSync } from 'node:fs'
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import {
   buildSignedGrant,
+  loadLeakCorpus,
   makeCaseResult,
   newCaseContext,
   runGuardedRead,
@@ -10,10 +8,6 @@ import {
   type ConformanceCase,
 } from '../harness.js'
 import type { Frame, Lens } from '../../types.js'
-import type { ReadRequest } from '../../gate-engine.js'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
 
 /**
  * Case 11 — Cross-tenant isolation (PROPOSAL-SLF §5 / §6).
@@ -92,8 +86,7 @@ export const crossTenantIsolationCase: ConformanceCase = async () => {
   ]
   const canaryAbsentFromBFetcher = tenantBFacts.every((f) => f.id !== CANARY_ID)
 
-  const corpusPath = join(__dirname, '../leak-corpus.json')
-  const corpus: ReadRequest[] = JSON.parse(readFileSync(corpusPath, 'utf-8'))
+  const corpus = loadLeakCorpus()
 
   let crossTenantLeakCount = 0
   let terminalCount = 0

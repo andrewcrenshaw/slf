@@ -1,18 +1,12 @@
-import { readFileSync } from 'node:fs'
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
 import {
   buildSignedGrant,
+  loadLeakCorpus,
   makeCaseResult,
   newCaseContext,
   runGuardedRead,
   spyFetcher,
   type ConformanceCase,
 } from '../harness.js'
-import type { ReadRequest } from '../../gate-engine.js'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
 
 /**
  * Case 10 — Canary exfiltration through a lens (PROPOSAL-SLF §5 / §6).
@@ -57,8 +51,7 @@ export const canaryExfiltrationCase: ConformanceCase = async () => {
     { id: CANARY_ID, entity_type: 'secret', content: CANARY_CONTENT, domain: 'canary' },
   ]
 
-  const corpusPath = join(__dirname, '../leak-corpus.json')
-  const corpus: ReadRequest[] = JSON.parse(readFileSync(corpusPath, 'utf-8'))
+  const corpus = loadLeakCorpus()
 
   let leakCount = 0
   let terminalCount = 0

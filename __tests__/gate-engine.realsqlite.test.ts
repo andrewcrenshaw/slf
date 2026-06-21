@@ -1,6 +1,8 @@
 import { evaluateGateChain } from '../src/gate-engine.js'
 import { createSeededFixture, makeFetcher } from '../test-fixtures/seed-lessons.js'
 import { createGrant } from '../src/grant.js'
+import { signApprovalToken } from '../src/gates/hitl-gate.js'
+import { generateKeyPair } from '../src/did-key.js'
 import type { Lens, Frame } from '../src/types.js'
 
 const now = Math.floor(Date.now() / 1000)
@@ -103,19 +105,40 @@ describe('gate-engine (real SQLite)', () => {
     expect(result.disclosed.length).toBe(0)
   })
 
-  it('grants disclosure after a valid approval token is provided', async () => {
+  it('grants disclosure after a valid signed approval token is provided (PCC-3119)', async () => {
     const db = createSeededFixture([
       { id: 'f1', entity_type: 'fact', content: 'approved fact' },
     ])
     const fetcher = makeFetcher(db)
     const grant = makeGrant()
+    const approver = generateKeyPair()
+    const approvalToken = signApprovalToken(
+      { requestId: 'r5', approver: approver.did, iat: now - 10, exp: now + 600 },
+      approver.secretKey,
+    )
     const result = await evaluateGateChain(
       grant,
-      { requestId: 'r5', lens, frame: approvalFrame, approvalToken: 'approve:r5' },
+      { requestId: 'r5', lens, frame: approvalFrame, approvalToken },
       fetcher,
     )
 
     expect(result.outcome).toBe('granted')
     expect(result.disclosed.length).toBe(1)
+  })
+
+  it('does not grant on the pre-PCC-3119 bare approve: bypass token', async () => {
+    const db = createSeededFixture([
+      { id: 'f1', entity_type: 'fact', content: 'sensitive fact' },
+    ])
+    const fetcher = makeFetcher(db)
+    const grant = makeGrant()
+    const result = await evaluateGateChain(
+      grant,
+      { requestId: 'r6', lens, frame: approvalFrame, approvalToken: 'approve:r6' },
+      fetcher,
+    )
+
+    expect(result.outcome).not.toBe('granted')
+    expect(result.disclosed.length).toBe(0)
   })
 })

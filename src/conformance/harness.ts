@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { createGrant, signGrant, verifyGrant } from '../grant.js'
 import { generateKeyPair } from '../did-key.js'
 import {
@@ -170,6 +172,22 @@ export function tamperSignature(jws: string): string {
   const first = sig.charAt(0)
   parts[2] = (first === 'A' ? 'B' : 'A') + sig.slice(1)
   return parts.join('.')
+}
+
+/**
+ * Load the published adversarial leak corpus (src/conformance/leak-corpus.json),
+ * shared by the SLF-7 leak cases (10, 11).
+ *
+ * The path is resolved WITHOUT `import.meta` so this module parses under both
+ * runtimes the suite runs in: the Jest CJS transform injects `__dirname` (this
+ * file's real directory) and rejects a literal `import.meta` token, while
+ * `npx tsx bin/slf-conformance.ts` runs as ESM from the package root where
+ * `__dirname` is undefined. See bin/slf-conformance.ts for the same constraint.
+ */
+export function loadLeakCorpus(): ReadRequest[] {
+  const dir =
+    typeof __dirname !== 'undefined' ? __dirname : join(process.cwd(), 'src/conformance')
+  return JSON.parse(readFileSync(join(dir, 'leak-corpus.json'), 'utf-8')) as ReadRequest[]
 }
 
 export interface SuiteResult {

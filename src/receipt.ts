@@ -6,16 +6,28 @@ import { DISCLOSURE_GOVERNING_GATES, type GateChainResult } from './gate-engine.
 import { DEFAULT_ENFORCEMENT_TIER, type EnforcementTier } from './tier.js'
 
 /**
+ * The subject reference carried by a receipt whose data subject was not
+ * specified at build time — e.g. the engine and erasure paths that do not yet
+ * thread a data subject through {@link buildReceipt}. SP-1 requires every
+ * receipt to CARRY a subject reference; a deployment activating subject
+ * addressing threads a real subject via {@link BuildReceiptOptions.subjectRef}.
+ */
+export const UNSPECIFIED_SUBJECT = 'unspecified'
+
+/**
  * A signed audit receipt for one gate-chain outcome.
  *
  * Extends the SLF-1 `Receipt` shape (types.ts) with `gatesEvaluated`, the
- * ordered list of gates the chain ran, and `enforcementTier`, the tier the
- * enforcer achieved (PROPOSAL-SLF §3). Every terminal outcome (granted | denied
- * | partial | error) emits exactly one of these — see gate-engine.ts.
+ * ordered list of gates the chain ran, `enforcementTier`, the tier the
+ * enforcer achieved (PROPOSAL-SLF §3), and `subjectRef`, the data subject the
+ * operation concerned (SP-1). Every terminal outcome (granted | denied |
+ * partial | error) emits exactly one of these — see gate-engine.ts.
  */
 export interface Receipt extends BaseReceipt {
   gatesEvaluated?: string[]
   enforcementTier?: EnforcementTier
+  /** The data subject the operation concerned (SP-1); part of the signed payload. */
+  subjectRef?: string
 }
 
 /**
@@ -24,9 +36,12 @@ export interface Receipt extends BaseReceipt {
  * the payload from a stored receipt is byte-stable. `enforcementTier` is part of
  * the signed payload, so a holder cannot relabel a T3 receipt as T0 after the
  * fact without invalidating the signature and breaking the hash chain.
+ * `subjectRef` is likewise signed, so the subject a receipt is addressed to
+ * cannot be altered without breaking verification (SP-1).
  */
 export interface ReceiptPayload {
   grantRef: string
+  subjectRef: string
   outcome: GateOutcome
   reasonCode: string | null
   disclosedFields: string[]
@@ -72,6 +87,7 @@ function fieldNamesOf(facts: Array<Record<string, unknown>>): string[] {
 export function payloadOf(receipt: Receipt): ReceiptPayload {
   return {
     grantRef: receipt.grantRef,
+    subjectRef: receipt.subjectRef ?? UNSPECIFIED_SUBJECT,
     outcome: receipt.outcome,
     reasonCode: receipt.reasonCode ?? null,
     disclosedFields: receipt.disclosedFields ?? [],
@@ -118,12 +134,18 @@ export interface BuildReceiptOptions {
   chainId?: string
   /** Enforcement tier the producing principal achieved; defaults to T0 (Case A). */
   tier?: EnforcementTier
+  /**
+   * The data subject the operation concerned (SP-1). Defaults to
+   * {@link UNSPECIFIED_SUBJECT} for engine paths that do not yet thread a
+   * subject; activate subject addressing by passing the subject's identifier.
+   */
+  subjectRef?: string
 }
 
 /**
  * Build an (unsigned) receipt from a gate-chain outcome. The receipt carries
  * outcome, reason_code, disclosed_fields, redacted_fields, gates_evaluated,
- * enforcement_tier and grant_ref; its id is the hash-chain link off
+ * enforcement_tier, subject_ref and grant_ref; its id is the hash-chain link off
  * `prevReceiptId`.
  */
 export function buildReceipt(
@@ -133,6 +155,7 @@ export function buildReceipt(
 ): Receipt {
   const payload: ReceiptPayload = {
     grantRef: grant.id,
+    subjectRef: options.subjectRef ?? UNSPECIFIED_SUBJECT,
     outcome: chainResult.outcome,
     reasonCode: chainResult.reasonCode ?? null,
     disclosedFields: fieldNamesOf(chainResult.disclosed),
@@ -145,6 +168,7 @@ export function buildReceipt(
   return {
     id,
     grantRef: payload.grantRef,
+    subjectRef: payload.subjectRef,
     outcome: payload.outcome,
     reasonCode: chainResult.reasonCode,
     disclosedFields: payload.disclosedFields,
@@ -190,4 +214,91 @@ export async function verifyReceipt(receipt: Receipt, actorDid: string): Promise
   if (detectSkipEvaluation(receipt)) return false
 
   return true
+}
+
+/**
+ * A receipt copy addressed to its data subject (SP-1). It carries the issuer's
+ * PUBLIC did and the already-signed receipt — nothing the issuer holds
+ * privately — so a holder that does not trust the issuer can verify it from
+ * public material alone via {@link verifySubjectAddressedReceipt}.
+ */
+export interface SubjectAddressedReceipt {
+  /** The data subject this copy is addressed to; equals the signed receipt.subjectRef. */
+  subjectRef: string
+  /** The issuer's public did:key — the only key material a holder needs to verify. */
+  issuerDid: string
+  /** The signed, hash-chained receipt delivered to the subject. */
+  receipt: Receipt
+}
+
+/**
+ * Emit a subject-addressed copy of a signed receipt, for delivery to a recipient
+ * other than the issuing party (SP-1). The copy reveals only the issuer's public
+ * did alongside the already-signed receipt, so addressing a receipt to its
+ * subject moves no secret. Throws on an unsigned receipt — there is nothing for a
+ * third party to verify until the issuer has signed.
+ */
+export function emitSubjectAddressedReceipt(
+  receipt: Receipt,
+  issuerDid: string,
+): SubjectAddressedReceipt {
+  if (!receipt.actorSignature) {
+    throw new Error('emitSubjectAddressedReceipt: receipt is unsigned')
+  }
+  return {
+    subjectRef: receipt.subjectRef ?? UNSPECIFIED_SUBJECT,
+    issuerDid,
+    receipt,
+  }
+}
+
+/** The gate evaluations a holder independently confirms from a verified copy. */
+export interface VerifiedGateEvaluations {
+  outcome: GateOutcome
+  gatesEvaluated: string[]
+  disclosedFields: string[]
+  redactedFields: string[]
+  enforcementTier: EnforcementTier
+}
+
+export interface SubjectVerification {
+  /** true iff signature, subject-binding, and gate-evaluation integrity all hold. */
+  verified: boolean
+  /** Set when verification fails; identifies which check failed. */
+  reason?: string
+  /** The signed gate evaluations, returned only when verification holds. */
+  gateEvaluations?: VerifiedGateEvaluations
+}
+
+/**
+ * Verify a subject-addressed receipt copy AS A HOLDER that does not possess the
+ * issuer's private keys (SP-1 third-party verifiability). Using only the public
+ * did carried in the copy, it confirms:
+ *  1. the actor signature is valid and bound to the receipt content — so the
+ *     gate evaluations are exactly the ones the issuer signed,
+ *  2. the envelope's subjectRef equals the signed subjectRef, so a copy cannot
+ *     be re-addressed to a different subject without breaking the signature.
+ * Returns the verified gate evaluations so the subject can read the provenance
+ * the receipt records. Requires no secret the issuer holds.
+ */
+export async function verifySubjectAddressedReceipt(
+  copy: SubjectAddressedReceipt,
+): Promise<SubjectVerification> {
+  if (!(await verifyReceipt(copy.receipt, copy.issuerDid))) {
+    return { verified: false, reason: 'receipt-signature-invalid' }
+  }
+  const signedSubject = copy.receipt.subjectRef ?? UNSPECIFIED_SUBJECT
+  if (copy.subjectRef !== signedSubject) {
+    return { verified: false, reason: 'subject-binding-mismatch' }
+  }
+  return {
+    verified: true,
+    gateEvaluations: {
+      outcome: copy.receipt.outcome,
+      gatesEvaluated: copy.receipt.gatesEvaluated ?? [],
+      disclosedFields: copy.receipt.disclosedFields ?? [],
+      redactedFields: copy.receipt.redactedFields ?? [],
+      enforcementTier: copy.receipt.enforcementTier ?? DEFAULT_ENFORCEMENT_TIER,
+    },
+  }
 }

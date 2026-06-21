@@ -1,7 +1,5 @@
 # slf-core
 
-[![DOI](https://zenodo.org/badge/1260677156.svg)](https://doi.org/10.5281/zenodo.20571989)
-
 Reference implementation of **Substrate-Lens-Frame (SLF)**, a governance layer for agent memory. Apache-2.0.
 
 Agent memory has become its own layer in the AI stack, and almost all of the work in it goes to one question: how well can the system recall the right fact at the right time. That work matters. But it leaves a second question open, and it is the one that decides whether agent memory can be trusted with regulated or personal data - who is allowed to see a fact, how its meaning changes by role and jurisdiction, and what was disclosed to whom. SLF puts the access rules inside the fact, so the rules travel with the fact and are re-checked on every read.
@@ -29,11 +27,11 @@ Evaluation is monotonic: substrate gates, then lens, then frame, then human appr
 
 ```bash
 npm install
-npm test          # 126 tests across 19 suites
-npm run bench     # gate-engine + crypto microbenchmarks
+npx tsx bin/slf-conformance.ts   # conformance suite: nine cases, exits 0 on a green run
+npm run bench                    # gate-engine + crypto microbenchmarks
 ```
 
-A standard `npm install` builds everything the suite needs, and all 126 tests pass. A few integration tests drive the gate engine against a real SQLite substrate through `better-sqlite3`, a native module compiled during install - if you install with `--ignore-scripts`, or on a platform with neither a prebuilt binary nor a build toolchain, the native driver is absent and those tests cannot load. A plain `npm install` resolves it.
+`npx tsx bin/slf-conformance.ts` runs the conformance suite end to end under ESM and exits 0 on a green run, so it reproduces on a clean clone with no native modules. It is the executable artifact behind the claim that SLF is enforced by code. The full developer suite runs under Jest with `npm test`; it adds the property suite and the threat-model cases, and drives a few integration tests against a real SQLite substrate through `better-sqlite3`, a native module compiled during `npm install` - if you install with `--ignore-scripts`, or on a platform with neither a prebuilt binary nor a build toolchain, the native driver is absent and those tests cannot load.
 
 ## Quickstart
 
@@ -89,7 +87,7 @@ accepted.accepted                           // true
 The conformance suite is the artifact behind the claim that SLF is enforced by code, not prose.
 
 ```bash
-npx jest conformance
+npx tsx bin/slf-conformance.ts
 ```
 
 The command-line suite runs nine cases; the test gate adds three threat-model cases, the property suite, and the crypto-erasure case.
@@ -165,7 +163,7 @@ bench/                          gate-engine + crypto microbenchmarks
 
 ## Reference and citation
 
-`slf-core` is the reference implementation for the position paper *The Governance Gap in Agentic Memory: Substrate-Lens-Frame, a sovereign, auditable memory protocol for AI agents* (Andrew Crenshaw, 2026). See [CITATION.cff](CITATION.cff). Paper DOI: [10.5281/zenodo.20571518](https://doi.org/10.5281/zenodo.20571518). This release (v0.1.0) DOI: [10.5281/zenodo.20571990](https://doi.org/10.5281/zenodo.20571990) (concept DOI for all versions: [10.5281/zenodo.20571989](https://doi.org/10.5281/zenodo.20571989)). The project hub - paper, specifications, and background - lives at https://lexenne.com/slf.
+`slf-core` is the reference implementation for the position paper *The Governance Gap in Agentic Memory: Substrate-Lens-Frame, a sovereign, auditable memory protocol for AI agents* (Andrew Crenshaw, 2026). See [CITATION.cff](CITATION.cff). The canonical paper and a citable DOI are added here on deposit. The project hub - paper, specifications, and background - lives at https://lexenne.com/slf.
 
 ## Stewardship
 

@@ -13,12 +13,15 @@ import { hitlApprovalCase } from '../src/conformance/cases/06-hitl-approval.js'
 import { realCorpusCase } from '../src/conformance/real-corpus.js'
 import { canaryExfiltrationCase } from '../src/conformance/cases/10-canary-exfiltration.js'
 import { crossTenantIsolationCase } from '../src/conformance/cases/11-cross-tenant-isolation.js'
+import { sp1SubjectAddressedReceiptCase } from '../src/conformance/cases/13-sp1-subject-addressed-receipt.js'
+import { sp2PortableExportCase } from '../src/conformance/cases/14-sp2-portable-export.js'
 
 /**
  * The full SLF conformance suite: six executable cases plus one case that runs
- * against a read-only snapshot of the real Alexandria corpus, plus two adversarial
- * leak cases (SLF-7 / PCC-2865). A green run is the artifact that backs the
- * claim "SLF is protected by code, not docs."
+ * against a read-only snapshot of the real Alexandria corpus, two adversarial
+ * leak cases (SLF-7 / PCC-2865), the SP-1 subject-addressability capability case
+ * (PCC-3123), and the SP-2 portable-export capability case (PCC-3124). A green run
+ * is the artifact that backs the claim "SLF is protected by code, not docs."
  */
 export const CASES: ConformanceCase[] = [
   validGrantCase,
@@ -30,6 +33,8 @@ export const CASES: ConformanceCase[] = [
   realCorpusCase,
   canaryExfiltrationCase,
   crossTenantIsolationCase,
+  sp1SubjectAddressedReceiptCase,
+  sp2PortableExportCase,
 ]
 
 /** Render a human-readable report of a suite run. */

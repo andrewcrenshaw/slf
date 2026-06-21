@@ -3,6 +3,7 @@ import { createGrant, signGrant, verifyGrant } from '../src/grant.js'
 import { verifyGrantCached, clearGrantCache } from '../src/grant-cache.js'
 import { evaluateGateChain } from '../src/gate-engine.js'
 import type { Lens, Frame, Grant } from '../src/types.js'
+import { jest } from '@jest/globals'
 
 const now = Math.floor(Date.now() / 1000)
 
@@ -109,5 +110,36 @@ describe('evaluateGateChain with useGrantCache', () => {
     const withoutCache = await evaluateGateChain(grant, request, fetcher)
 
     expect(withCache).toEqual(withoutCache)
+  })
+})
+
+describe('verifyGrantCached — expiry re-checked on every read (TOCTOU, PCC-3120)', () => {
+  it('rejects a grant that expires after it was cached while valid', async () => {
+    const kp = generateKeyPair()
+    const t0 = Math.floor(Date.now() / 1000)
+    const grant = await signGrant(
+      makeGrant({ issuer: kp.did, validity: { iat: t0 - 60, exp: t0 + 100 } }),
+      kp.secretKey,
+    )
+
+    // Cached while still valid.
+    const whileValid = await verifyGrantCached(grant)
+    expect(whileValid.valid).toBe(true)
+
+    // Advance the wall clock past the grant's expiry.
+    const dateSpy = jest.spyOn(Date, 'now').mockReturnValue((t0 + 200) * 1000)
+    try {
+      // verifyGrant (uncached) correctly reports the grant as expired now...
+      const direct = await verifyGrant(grant)
+      expect(direct.valid).toBe(false)
+      expect(direct.reason).toBe('grant-expired')
+
+      // ...and the cached path must agree, not replay the stale valid verdict.
+      const afterExpiry = await verifyGrantCached(grant)
+      expect(afterExpiry.valid).toBe(false)
+      expect(afterExpiry.reason).toBe('grant-expired')
+    } finally {
+      dateSpy.mockRestore()
+    }
   })
 })

@@ -54,7 +54,7 @@ describe('SLF conformance suite', () => {
     const c = suite.results.find((r) => r.id === '06-hitl-approval')
     expect(c?.passed).toBe(true)
     expect(c?.assertions.find((a) => /pending_approval/i.test(a.label))?.ok).toBe(true)
-    expect(c?.assertions.find((a) => /approval token completes/i.test(a.label))?.ok).toBe(true)
+    expect(c?.assertions.find((a) => /token completes the read/i.test(a.label))?.ok).toBe(true)
   })
 
   it.each([
