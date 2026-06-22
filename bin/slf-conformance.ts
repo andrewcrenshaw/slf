@@ -15,13 +15,17 @@ import { canaryExfiltrationCase } from '../src/conformance/cases/10-canary-exfil
 import { crossTenantIsolationCase } from '../src/conformance/cases/11-cross-tenant-isolation.js'
 import { sp1SubjectAddressedReceiptCase } from '../src/conformance/cases/13-sp1-subject-addressed-receipt.js'
 import { sp2PortableExportCase } from '../src/conformance/cases/14-sp2-portable-export.js'
+import { sp3IndividualIdentityAnchoringCase } from '../src/conformance/cases/15-sp3-individual-identity-anchoring.js'
+import { sp4ReadInPlaceCase } from '../src/conformance/cases/16-sp4-read-in-place.js'
 
 /**
  * The full SLF conformance suite: six executable cases plus one case that runs
  * against a read-only snapshot of the real Alexandria corpus, two adversarial
  * leak cases (SLF-7 / PCC-2865), the SP-1 subject-addressability capability case
- * (PCC-3123), and the SP-2 portable-export capability case (PCC-3124). A green run
- * is the artifact that backs the claim "SLF is protected by code, not docs."
+ * (PCC-3123), the SP-2 portable-export capability case (PCC-3124), the SP-3
+ * individual-controlled identity-anchoring capability case (PCC-3125), and the
+ * SP-4 symmetric read-in-place capability case (PCC-3126). A green run is the
+ * artifact that backs the claim "SLF is protected by code, not docs."
  */
 export const CASES: ConformanceCase[] = [
   validGrantCase,
@@ -35,6 +39,8 @@ export const CASES: ConformanceCase[] = [
   crossTenantIsolationCase,
   sp1SubjectAddressedReceiptCase,
   sp2PortableExportCase,
+  sp3IndividualIdentityAnchoringCase,
+  sp4ReadInPlaceCase,
 ]
 
 /** Render a human-readable report of a suite run. */

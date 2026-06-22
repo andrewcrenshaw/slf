@@ -18,6 +18,9 @@ export const validGrantCase: ConformanceCase = async () => {
   const { actor, ctx } = newCaseContext()
   const now = Math.floor(Date.now() / 1000)
   const frameId = 'read-summary'
+  // SP-3 subject seat (PCC-3138): a grant that names its data subject, so the
+  // engine-emitted receipt must carry that subject rather than 'unspecified'.
+  const subjectDid = 'did:key:z6MkSubjectCase01'
 
   const grant = await buildSignedGrant({
     issuer: actor.did,
@@ -26,6 +29,7 @@ export const validGrantCase: ConformanceCase = async () => {
     allowedFrames: [frameId],
     iat: now - 60,
     exp: now + 3600,
+    subject: subjectDid,
   })
 
   const lens: Lens = { id: 'lens-01', role: 'analyst', jurisdiction: 'us', entityTypes: ['fact'] }
@@ -62,6 +66,10 @@ export const validGrantCase: ConformanceCase = async () => {
       },
       { label: 'receipt outcome is granted', ok: receipt?.outcome === 'granted' },
       { label: 'receipt signature verifies against the actor DID', ok: verified },
+      {
+        label: 'engine receipt carries the grant subject (non-unspecified)',
+        ok: receipt?.subjectRef === subjectDid,
+      },
     ],
   )
 }

@@ -151,6 +151,8 @@ export async function buildSignedGrant(params: {
   allowedFrames: string[]
   iat: number
   exp: number
+  /** SP-3 (D1) data subject DID the grant concerns; omitted -> subjectless grant. */
+  subject?: string
 }): Promise<Grant> {
   const grant = createGrant({
     issuer: params.issuer,
@@ -161,6 +163,7 @@ export async function buildSignedGrant(params: {
     scopeExpression: params.scopeExpression,
     allowedFrames: params.allowedFrames,
     validity: { iat: params.iat, exp: params.exp },
+    subject: params.subject,
   })
   return signGrant(grant, params.secretKey)
 }
