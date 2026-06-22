@@ -338,6 +338,7 @@ export async function evaluateGateChainWithReceipt(
     prevReceiptId: previous?.id,
     chainId: previous?.chainId,
     subjectRef: grant.subject,
+    custodian: isReadInPlaceFetcher(fetcher) ? grant.subject : undefined,
   })
   const receipt = await signReceipt(unsigned, ctx.actorSecretKey)
   await ctx.store.append(receipt)

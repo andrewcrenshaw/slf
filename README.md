@@ -103,7 +103,7 @@ The command-line suite runs nine cases; the test gate adds three threat-model ca
 | 07 skip-eval-detected | A receipt that discloses without naming the governing gates is rejected as a forgery |
 | 08 suppressed-receipt-rejected | The relying side refuses disclosed data that arrives with no valid receipt |
 | 09 tier-claim-mismatch | A weaker-tier receipt cannot claim a stronger tier's guarantee |
-| 10 canary-exfiltration | Across a 32-variant adversarial corpus, a prompt-broadened agent reaches zero canary leakage; every exclusion is receipted |
+| 10 canary-exfiltration | Across a corpus of lens-broadening adversarial variants, zero canary leakage at both the substrate gate and the lens stage; every exclusion is receipted |
 | 11 cross-tenant-isolation | A cross-tenant adversary reaches zero cross-tenant disclosures |
 | 12 crypto-erasure | Sealed content round-trips, and is unrecoverable once the per-subject key is shredded |
 | real-corpus | The gate chain enforces a grant against a read-only snapshot of a real agent-memory corpus. It skips cleanly when none is present, which is the right behavior for a public clone. |
@@ -119,7 +119,7 @@ Keeping these apart is the point.
 - the grant to scoped-read to receipt round trip, with a gate-excluded fact never reaching the reader;
 - a signed receipt on every terminal operation, and a tampered or suppressed receipt rejected;
 - monotonic narrowing, over more than a thousand generated cases;
-- zero leakage across a 32-variant adversarial corpus, every exclusion receipted;
+- zero leakage across a corpus of lens-broadening adversarial variants — substrate-gate and lens-stage exclusions both covered, every exclusion receipted;
 - crypto-erasure: sealed content is unrecoverable once the per-subject key is shredded.
 
 **Measured** (single Apple M4 core; see [BENCHMARK.md](BENCHMARK.md)): once a grant is verified, gate evaluation on the read path runs at about a nine-microsecond 95th-percentile latency, roughly 0.1% of a typical vector retrieval at 5 to 20 milliseconds. The cost lives on the write path: every operation signs a receipt (an Ed25519 signature is about 146 microseconds), a receipt write-amplification of roughly 90x the warm read throughput. Batched or asynchronous receipt emission reduces that ratio. The synchronous figure is reported here rather than hidden behind the read-path number.
@@ -130,7 +130,7 @@ Keeping these apart is the point.
 
 These keep the claims on register, and they are not optional:
 
-- This is **conformance-tested**, not "proven secure," "formally verified," or "audited." The leak result is evidence under attack across 32 variants, not a proof of non-interference.
+- This is **conformance-tested**, not "proven secure," "formally verified," or "audited." The leak result is evidence under attack across a corpus of lens-broadening variants, not a proof of non-interference.
 - A protocol cannot be "compliant." `slf-core` is **compliance-enabling**: it produces the gates, enforcement points, and receipts a deployer's data-protection impact assessment can cite as mitigating measures. Only a deployed system can be assessed for compliance.
 - The numbers are single-machine, single-core measurements, not a load test at scale.
 - The cryptography rests on the standard `@noble` libraries used in a standard way. It has not had a formal cryptographic audit.

@@ -754,5 +754,27 @@
         "read-facts"
       ]
     }
+  },
+  {
+    "requestId": "adv-033",
+    "attackCategory": "lens-narrowing:classified-excluded",
+    "lens": {
+      "id": "lens-adv-033",
+      "role": "analyst",
+      "jurisdiction": "us",
+      "entityTypes": [
+        "fact"
+      ]
+    },
+    "frame": {
+      "id": "read-facts",
+      "taskSlug": "read-facts",
+      "intent": "read facts only",
+      "nextStep": "review",
+      "requiresApproval": false,
+      "allowedFrames": [
+        "read-facts"
+      ]
+    }
   }
 ]

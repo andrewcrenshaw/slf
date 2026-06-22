@@ -15,6 +15,7 @@ import {
   type ReadRequest,
 } from '../../gate-engine.js'
 import { emitSubjectAddressedReceipt, verifySubjectAddressedReceipt, type Receipt } from '../../receipt.js'
+import { acceptDisclosure } from '../../consume.js'
 import type { Frame, Lens, ScopeExpression } from '../../types.js'
 
 /**
@@ -32,23 +33,26 @@ import type { Frame, Lens, ScopeExpression } from '../../types.js'
  * This case proves, with one fact that discloses and one a gate withholds:
  *  - SYMMETRY: the issuer-held and subject-held reads return the identical
  *    outcome and identical disclosed set (the engine "operates identically");
- *  - an EXTERNAL consumer (grant audience ≠ subject), cryptographically bound to
+ *  - an EXTERNAL consumer (grant audience != subject), cryptographically bound to
  *    the grant, opens a frame against subject-held substrate and receives a gated,
  *    gate-passing-only read;
  *  - NO FULL COPY crosses the boundary: the engine never calls the copy-out path
  *    (fetchFacts); only the gate-passing fact crosses; and the withheld fact's
- *    private value — which the issuer-held in-process path DID carry into the
- *    redaction record — never crosses on the subject-held path (load-bearing,
+ *    private value -- which the issuer-held in-process path DID carry into the
+ *    redaction record -- never crosses on the subject-held path (load-bearing,
  *    non-vacuous contrast);
  *  - a RECEIPT is issued to the subject: the engine signs a receipt carrying the
- *    subject reference, and the subject — holding their own key, never the issuer's
- *    secret — verifies a subject-addressed copy from public material alone;
+ *    subject reference, and the subject -- holding their own key, never the issuer's
+ *    secret -- verifies a subject-addressed copy from public material alone;
+ *  - the receipt carries enforcementTier T0 (sovereign self-enforcement, D3/D5) and
+ *    a custodian field equal to the subject DID (D5); acceptDisclosure at required
+ *    tier T0 accepts it (section 5.4);
  *  - the INVERTED topology (issuer === subject: the individual issues the grant)
  *    reads in place identically.
  */
 export const sp4ReadInPlaceCase: ConformanceCase = async () => {
   const enterprise = generateKeyPair() // issuer in the enterprise-held deployment
-  const subject = generateKeyPair() // the individual — holds the substrate and their own key
+  const subject = generateKeyPair() // the individual -- holds the substrate and their own key
   const consumer = generateKeyPair() // an external consumer (grant audience), distinct from the subject
 
   const now = Math.floor(Date.now() / 1000)
@@ -148,35 +152,35 @@ export const sp4ReadInPlaceCase: ConformanceCase = async () => {
 
   const enterpriseGrant = await grantFrom(enterprise, consumer.did)
 
-  // ── Issuer-held topology: the engine fetches the full raw substrate, gates in-process ──
+  // -- Issuer-held topology: the engine fetches the full raw substrate, gates in-process --
   const issuer = await read(enterpriseGrant, spyFetcher(substrate), 'case-16-issuer')
   const issuerResult = issuer.result
 
-  // ── Subject-held topology: the substrate gates in place; only passing facts cross ──
+  // -- Subject-held topology: the substrate gates in place; only passing facts cross --
   const store = subjectHeldStore(substrate)
   const subjectRead = await read(enterpriseGrant, store, 'case-16-subject')
   const subjectResult = subjectRead.result
 
-  // ── SYMMETRY: identical outcome and identical disclosed set on both topologies ──
+  // -- SYMMETRY: identical outcome and identical disclosed set on both topologies --
   const symmetric =
     issuerResult.outcome === subjectResult.outcome &&
     JSON.stringify(issuerResult.disclosed) === JSON.stringify(subjectResult.disclosed)
 
-  // ── External consumer receives a gated, gate-passing-only read ──
+  // -- External consumer receives a gated, gate-passing-only read --
   const externalConsumer = consumer.did !== subject.did && enterpriseGrant.audience === consumer.did
   const gatedRead =
     subjectResult.outcome === 'granted' &&
     subjectResult.disclosed.length === 1 &&
     subjectResult.disclosed[0].id === 'f1'
 
-  // ── Gate-passing only: the restricted fact is withheld, never disclosed (non-vacuous) ──
+  // -- Gate-passing only: the restricted fact is withheld, never disclosed (non-vacuous) --
   const restrictedWithheld =
     !subjectResult.disclosed.some((f) => f.id === 'f2') &&
     subjectResult.redacted.some((r) => r.reasonCode === 'gate-tag-restricted')
 
-  // ── NO FULL COPY crosses the boundary ──
+  // -- NO FULL COPY crosses the boundary --
   // The engine never demanded the full substrate; only the passing fact crossed;
-  // and the withheld value never crossed on the subject-held path — while the
+  // and the withheld value never crossed on the subject-held path -- while the
   // issuer-held in-process path DID carry it into the redaction record (the
   // load-bearing contrast that makes this non-vacuous).
   const subjectSurface = JSON.stringify({
@@ -192,7 +196,7 @@ export const sp4ReadInPlaceCase: ConformanceCase = async () => {
     !subjectSurface.includes(SENTINEL) &&
     issuerCarriedValue
 
-  // ── RECEIPT issued to the subject, verifiable by the subject as a non-issuer holder ──
+  // -- RECEIPT issued to the subject, verifiable by the subject as a non-issuer holder --
   const subjectReceipt = subjectRead.receipt
   const carriesSubject = subjectReceipt?.subjectRef === subject.did
   let receiptToSubjectVerified = false
@@ -207,7 +211,19 @@ export const sp4ReadInPlaceCase: ConformanceCase = async () => {
     copyCarriesNoIssuerSecret = copy.issuerDid === subjectRead.actorDid && !JSON.stringify(copy).includes('"secretKey"')
   }
 
-  // ── INVERTED topology (issuer === subject): the individual issues the grant ──
+  // -- SECTION 5.4: enforcementTier T0, custodian = subject DID, acceptDisclosure accepts (D5) --
+  const tierIsT0 = subjectReceipt?.enforcementTier === 'T0'
+  const custodianIsSubject = subjectReceipt?.custodian === subject.did
+  let acceptedAtT0 = false
+  if (subjectReceipt) {
+    const verdict = await acceptDisclosure(
+      { receipt: subjectReceipt, data: subjectResult.disclosed },
+      { actorDid: subjectRead.actorDid, requiredTier: 'T0' },
+    )
+    acceptedAtT0 = verdict.accepted === true
+  }
+
+  // -- INVERTED topology (issuer === subject): the individual issues the grant --
   const invertedGrant = await grantFrom(subject, consumer.did)
   const invertedStore = subjectHeldStore(substrate)
   const inverted = await read(invertedGrant, invertedStore, 'case-16-inverted')
@@ -218,14 +234,17 @@ export const sp4ReadInPlaceCase: ConformanceCase = async () => {
 
   return makeCaseResult(
     '16-sp4-read-in-place',
-    'SP-4: the engine reads subject-held substrate in place — identical to issuer-held, gated, receipted, no full copy crosses',
+    'SP-4: the engine reads subject-held substrate in place -- identical to issuer-held, gated, receipted, no full copy crosses',
     [
       { label: 'issuer-held and subject-held reads return the identical outcome and disclosed set (operates identically)', ok: symmetric },
-      { label: 'an external consumer (audience ≠ subject) opens a frame and receives a gated read', ok: externalConsumer && gatedRead },
-      { label: 'only gate-passing facts cross — the restricted fact is withheld, never disclosed (non-vacuous)', ok: restrictedWithheld },
+      { label: 'an external consumer (audience != subject) opens a frame and receives a gated read', ok: externalConsumer && gatedRead },
+      { label: 'only gate-passing facts cross -- the restricted fact is withheld, never disclosed (non-vacuous)', ok: restrictedWithheld },
       { label: 'no full copy crosses the boundary: the copy-out path is never called and the withheld value never crosses (load-bearing)', ok: noFullCopy },
       { label: 'a receipt is issued to the subject (carries the subject reference)', ok: carriesSubject === true },
       { label: 'the subject verifies a subject-addressed receipt copy from public material alone (no issuer secret)', ok: receiptToSubjectVerified && copyAddressedToSubject && copyCarriesNoIssuerSecret },
+      { label: 'receipt carries enforcementTier T0 (sovereign self-enforcement, D3/D5)', ok: tierIsT0 },
+      { label: 'receipt custodian field is the subject DID (D5)', ok: custodianIsSubject },
+      { label: 'acceptDisclosure at required tier T0 accepts the disclosure (section 5.4)', ok: acceptedAtT0 },
       { label: 'the inverted topology (issuer === subject) reads in place identically', ok: invertedSymmetric },
     ],
   )

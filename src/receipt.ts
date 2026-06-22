@@ -28,6 +28,8 @@ export interface Receipt extends BaseReceipt {
   enforcementTier?: EnforcementTier
   /** The data subject the operation concerned (SP-1); part of the signed payload. */
   subjectRef?: string
+  /** The DID of the substrate custodian (SP-4 D5); equals the subject DID for read-in-place. */
+  custodian?: string
 }
 
 /**
@@ -38,6 +40,7 @@ export interface Receipt extends BaseReceipt {
  * fact without invalidating the signature and breaking the hash chain.
  * `subjectRef` is likewise signed, so the subject a receipt is addressed to
  * cannot be altered without breaking verification (SP-1).
+ * `custodian` is signed when present (SP-4 D5), so a relay cannot strip it.
  */
 export interface ReceiptPayload {
   grantRef: string
@@ -49,6 +52,7 @@ export interface ReceiptPayload {
   gatesEvaluated: string[]
   enforcementTier: EnforcementTier
   timestamp: number
+  custodian?: string
 }
 
 /**
@@ -85,7 +89,7 @@ function fieldNamesOf(facts: Array<Record<string, unknown>>): string[] {
 
 /** Normalise a receipt back to the deterministic payload used for hashing/signing. */
 export function payloadOf(receipt: Receipt): ReceiptPayload {
-  return {
+  const base: ReceiptPayload = {
     grantRef: receipt.grantRef,
     subjectRef: receipt.subjectRef ?? UNSPECIFIED_SUBJECT,
     outcome: receipt.outcome,
@@ -96,6 +100,8 @@ export function payloadOf(receipt: Receipt): ReceiptPayload {
     enforcementTier: receipt.enforcementTier ?? DEFAULT_ENFORCEMENT_TIER,
     timestamp: receipt.timestamp,
   }
+  if (receipt.custodian !== undefined) base.custodian = receipt.custodian
+  return base
 }
 
 /**
@@ -140,6 +146,11 @@ export interface BuildReceiptOptions {
    * subject; activate subject addressing by passing the subject's identifier.
    */
   subjectRef?: string
+  /**
+   * The DID of the substrate custodian (SP-4 D5). Set to the subject DID on the
+   * read-in-place path; omitted on the standard issuer-held path.
+   */
+  custodian?: string
 }
 
 /**
@@ -164,8 +175,9 @@ export function buildReceipt(
     enforcementTier: options.tier ?? DEFAULT_ENFORCEMENT_TIER,
     timestamp: options.timestamp,
   }
+  if (options.custodian !== undefined) payload.custodian = options.custodian
   const id = computeReceiptId(payload, options.prevReceiptId)
-  return {
+  const receipt: Receipt = {
     id,
     grantRef: payload.grantRef,
     subjectRef: payload.subjectRef,
@@ -179,6 +191,8 @@ export function buildReceipt(
     prevReceiptId: options.prevReceiptId,
     chainId: options.chainId ?? id,
   }
+  if (payload.custodian !== undefined) receipt.custodian = payload.custodian
+  return receipt
 }
 
 /** Sign a receipt with the actor's Ed25519 secret key (compact JWS). */
